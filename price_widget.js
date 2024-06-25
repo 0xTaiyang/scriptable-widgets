@@ -75,14 +75,14 @@ async function bestP2P() {
     if (bestBn > bestOkx) {
         return {  
           "name": "OKX",
-          "subName": " / ICBC",
+          "subName": "/ ICBC",
           "data": String(bestOkx),
           "subData": bankDataSmallText
         }
     } else {
         return {  
           "name": "Binance",
-          "subName": " / ICBC",
+          "subName": "/ ICBC",
           "data": String(bestBn),
           "subData": bankDataSmallText
         }
@@ -102,7 +102,6 @@ async function getHSBC(notifyLevel) {
     const maxPairReq = new Request("https://workers.taiyang.eu.org/hsbc-au-cny?" + "&notifyLevel=" + notifyLevel);
     let apy = await maxPairReq.loadJSON();
     apy.data = apy.data.toFixed(2) + "%"
-    apy.subName = "CNY"
     return apy;
 };
 
@@ -114,10 +113,9 @@ async function widget() {
 
     const data = [btc, eth, hsbc, p2p]
 
-    const fontSize = 20
-    const subFontSize = 12
+    const font = new Font("Menlo-Bold", 20)
+    const subFont =  new Font("Menlo-Regular",10)
     const dataColour = "33B864"
-    const spacing = 12
 
     const list = new ListWidget();
 
@@ -130,19 +128,19 @@ async function widget() {
         let item = data[i]
 
         nameText = stack.addText(item["name"])
-        nameText.font = Font.boldSystemFont(fontSize)
+        nameText.font = font
         if (item.hasOwnProperty('subName') && item.subName != null) {
-            subNameText = stack.addText(item.subName)
-            subNameText.font = Font.regularSystemFont(subFontSize)
+            subNameText = stack.addText(" "+item.subName)
+            subNameText.font = subFont
         }
 
         stack.addSpacer()
         dataText = stack.addText(item["data"])
-        dataText.font = Font.boldSystemFont(fontSize)
+        dataText.font = font
         dataText.textColor = new Color(dataColour)
         if (item.hasOwnProperty('subData') && item.subData != null) {
             subDataText =stack.addText(item.subData)
-            subDataText.font = Font.regularSystemFont(subFontSize)
+            subDataText.font = subFont
             subDataText.textColor = new Color(dataColour)
         }
 
