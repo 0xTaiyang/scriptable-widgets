@@ -83,7 +83,7 @@ async function bestP2P() {
     }
 }
 
-async function getData(symbol, notifyLevel) {
+async function getOkxBasis(symbol, notifyLevel) {
     const maxPairReq = new Request("https://****/okx-basis?symbol=" + symbol + "&notifyLevel=" + notifyLevel);
     let maxPair = await maxPairReq.loadJSON();
     maxPair.data = maxPair.data.toFixed(2) + "%"
