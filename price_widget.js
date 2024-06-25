@@ -41,6 +41,7 @@ async function okxP2P() {
         console.error("Error fetching data: ", error);
     }
 }
+
 async function bank(ccy, bankName) {
 
     const url = 'https://wx.sunrate.com/api/price/getAllBankForex'
@@ -62,50 +63,59 @@ async function bank(ccy, bankName) {
 }
 
 async function bestP2P() {
+    const bankData = await bank('USD', 'icbc')
+    const bankDataSmallText = ' / ' + String(bankData.toFixed(2))
+
     const bnData = await bnP2P();
-    const bnBest = parseFloat(bnData.data[0].adv.price)
+    const bestBn = parseFloat(bnData.data[0].adv.price)
 
     const okxData = await okxP2P();
     const bestOkx = parseFloat(okxData.data.sell[0].price)
 
-    const bankData = await bank('USD', 'icbc')
-
-    if (bnBest > bestOkx) {
-        return {
-            "name": "OKX / ICBC",
-            "data": String(bestOkx) + ' / ' + String(bankData.toFixed(2))
+    if (bestBn > bestOkx) {
+        return {  
+          "name": "OKX",
+          "subName": " / ICBC",
+          "data": String(bestOkx),
+          "subData": bankDataSmallText
         }
     } else {
-        return {
-            "name": "Binance / ICBC",
-            "data": String(bnBest) + ' / ' + String(bankData.toFixed(2))
+        return {  
+          "name": "Binance",
+          "subName": " / ICBC",
+          "data": String(bestBn),
+          "subData": bankDataSmallText
         }
-    }
+     }
+   
+
 }
 
 async function getOkxBasis(symbol, notifyLevel) {
-    const maxPairReq = new Request("https://****/okx-basis?symbol=" + symbol + "&notifyLevel=" + notifyLevel);
+    const maxPairReq = new Request("https://workers.taiyang.eu.org/okx-basis?symbol=" + symbol + "&notifyLevel=" + notifyLevel);
     let maxPair = await maxPairReq.loadJSON();
     maxPair.data = maxPair.data.toFixed(2) + "%"
     return maxPair;
 };
 
 async function getHSBC(notifyLevel) {
-    const maxPairReq = new Request("https://****/hsbc-au-cny?" + "&notifyLevel=" + notifyLevel);
+    const maxPairReq = new Request("https://workers.taiyang.eu.org/hsbc-au-cny?" + "&notifyLevel=" + notifyLevel);
     let apy = await maxPairReq.loadJSON();
     apy.data = apy.data.toFixed(2) + "%"
+    apy.subName = "CNY"
     return apy;
 };
 
 async function widget() {
-    const btc = await getData("BTC", "20");
-    const eth = await getData("ETH", "20");
+    const btc = await getOkxBasis("BTC", "20");
+    const eth = await getOkxBasis("ETH", "20");
     const hsbc = await getHSBC("3");
     const p2p = await bestP2P()
 
     const data = [btc, eth, hsbc, p2p]
 
     const fontSize = 20
+    const subFontSize = 12
     const dataColour = "33B864"
     const spacing = 12
 
@@ -121,10 +131,21 @@ async function widget() {
 
         nameText = stack.addText(item["name"])
         nameText.font = Font.boldSystemFont(fontSize)
+        if (item.hasOwnProperty('subName') && item.subName != null) {
+            subNameText = stack.addText(item.subName)
+            subNameText.font = Font.regularSystemFont(subFontSize)
+        }
+
         stack.addSpacer()
         dataText = stack.addText(item["data"])
         dataText.font = Font.boldSystemFont(fontSize)
         dataText.textColor = new Color(dataColour)
+        if (item.hasOwnProperty('subData') && item.subData != null) {
+            subDataText =stack.addText(item.subData)
+            subDataText.font = Font.regularSystemFont(subFontSize)
+            subDataText.textColor = new Color(dataColour)
+        }
+
         if (i < data.length - 1) {
             mainStack.addSpacer()
         }
