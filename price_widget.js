@@ -92,14 +92,14 @@ async function bestP2P() {
 }
 
 async function getOkxBasis(symbol, notifyLevel) {
-    const maxPairReq = new Request("https://workers.taiyang.eu.org/okx-basis?symbol=" + symbol + "&notifyLevel=" + notifyLevel);
+    const maxPairReq = new Request("https://***/okx-basis?symbol=" + symbol + "&notifyLevel=" + notifyLevel);
     let maxPair = await maxPairReq.loadJSON();
     maxPair.data = maxPair.data.toFixed(2) + "%"
     return maxPair;
 };
 
 async function getHSBC(notifyLevel) {
-    const maxPairReq = new Request("https://workers.taiyang.eu.org/hsbc-au-cny?" + "&notifyLevel=" + notifyLevel);
+    const maxPairReq = new Request("https://***/hsbc-au-cny?" + "&notifyLevel=" + notifyLevel);
     let apy = await maxPairReq.loadJSON();
     apy.data = apy.data.toFixed(2) + "%"
     return apy;
